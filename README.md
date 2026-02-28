@@ -1,0 +1,2 @@
+# snzr
+Sneeze Tracking App
