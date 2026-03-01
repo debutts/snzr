@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func createSneeze(c *gin.Context) {
+func CreateSneeze(c *gin.Context) {
 	var request models.CreateSneezeRequest
 
 	if err := c.BindJSON(&request); err != nil {
@@ -15,9 +15,8 @@ func createSneeze(c *gin.Context) {
 		return
 	}
 
-	var newSneeze models.Sneeze = request.ToSneeze()
-
-	sneezeHistory = append(sneezeHistory, newSneeze)
+	newSneeze := request.ToSneeze()
+	sneezeHistory[newSneeze.Id] = newSneeze
 
 	c.IndentedJSON(http.StatusCreated, newSneeze)
 }
