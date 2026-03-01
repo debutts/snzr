@@ -5,7 +5,6 @@ import (
 	"snzr/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 func createSneeze(c *gin.Context) {
@@ -16,14 +15,7 @@ func createSneeze(c *gin.Context) {
 		return
 	}
 
-	var newSneeze models.Sneeze = {
-		Id: uuid.New().String(),
-		OccurredAt: request.OccurredAt | time.Now(),
-		Notes: request.Notes,
-		Volume: request.Volume,
-		Location: request.Location
-
-	}
+	var newSneeze models.Sneeze = request.ToSneeze()
 
 	sneezeHistory = append(sneezeHistory, newSneeze)
 
