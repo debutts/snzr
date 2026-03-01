@@ -1,4 +1,4 @@
-package models
+package domain/sneeze/models
 
 import (
 	"time"
@@ -20,6 +20,7 @@ func (request CreateSneezeRequest) ToSneeze() Sneeze {
 	}
 	return Sneeze{
 		Id: uuid.New().String(),
+		UserId: "1221", //todo: get user id from context
 		Notes: request.Notes,
 		OccurredAt: occurredAt,
 		Location: request.Location,
