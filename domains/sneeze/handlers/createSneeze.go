@@ -1,8 +1,8 @@
-package handlers
+package domain/sneeze/handlers
 
 import (
 	"net/http"
-	"snzr/models"
+	"snzr/domains/sneeze/models"
 
 	"github.com/gin-gonic/gin"
 )
