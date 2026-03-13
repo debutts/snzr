@@ -20,13 +20,55 @@ profile.cov
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
-# Go workspace file
-go.work
-go.work.sum
-
 # env file
 .env
+.env.*
+!.env.example
 
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# -----------------------------------------------------------------------------
+# Python / FastAPI
+# -----------------------------------------------------------------------------
+# Bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+eggs/
+wheels/
+
+# Testing and coverage
+.coverage
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local / IDE
+*.swp
+*.swo
+*~
