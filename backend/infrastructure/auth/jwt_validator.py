@@ -1,84 +1,59 @@
-"""Validate Logto-issued JWTs and build AuthInfo. See https://docs.logto.io/authorization/validate-access-tokens."""
-from typing import Any
-
 import jwt
 from jwt import PyJWKClient
+from typing import Dict, Any
+from auth_middleware import AuthInfo, AuthorizationError, JWKS_URI, ISSUER
+import os
 
-from .config import ISSUER, JWKS_URI, LOGTO_API_RESOURCE, LOGTO_REQUIRED_SCOPES
-from .models import LogToAuthInfo
+jwks_client = PyJWKClient(JWKS_URI)
 
-
-class AuthorizationError(Exception):
-    """Raised when token is missing, invalid, or lacks required permissions."""
-
-    def __init__(self, message: str, status: int = 401) -> None:
-        self.message = message
-        self.status = status
-        super().__init__(self.message)
-
-
-def _get_jwks_client() -> PyJWKClient:
-    if not JWKS_URI:
-        raise AuthorizationError(
-            "LOGTO_ENDPOINT is not set; cannot verify JWTs",
-            status=503,
-        )
-    return PyJWKClient(JWKS_URI)
-
-
-def validate_jwt(token: str) -> dict[str, Any]:
-    """Verify JWT signature and standard claims; optionally audience and scopes. Returns payload."""
-    jwks_client = _get_jwks_client()
+def validate_jwt(token: str) -> Dict[str, Any]:
+    """Validate JWT and return payload"""
     try:
         signing_key = jwks_client.get_signing_key_from_jwt(token)
+
         payload = jwt.decode(
             token,
             signing_key.key,
-            algorithms=["RS256"],
+            algorithms=['RS256'],
             issuer=ISSUER,
-            options={"verify_aud": False},
+            options={'verify_aud': False}  # We'll verify audience manually
         )
+
+        verify_payload(payload)
+        return payload
+
     except jwt.InvalidTokenError as e:
-        raise AuthorizationError(f"Invalid token: {e!s}", 401) from e
+        raise AuthorizationError(f'Invalid token: {str(e)}', 401)
+    except Exception as e:
+        raise AuthorizationError(f'Token validation failed: {str(e)}', 401)
 
-    _verify_payload(payload)
-    return payload
+def create_auth_info(payload: Dict[str, Any]) -> AuthInfo:
+    """Create AuthInfo from JWT payload"""
+    scopes = payload.get('scope', '').split(' ') if payload.get('scope') else []
+    audience = payload.get('aud', [])
+    if isinstance(audience, str):
+        audience = [audience]
 
-
-def _verify_payload(payload: dict[str, Any]) -> None:
-    """Enforce audience and scope if configured (global API resource model)."""
-    if LOGTO_API_RESOURCE:
-        aud = payload.get("aud") or []
-        audiences = [aud] if isinstance(aud, str) else aud
-        if LOGTO_API_RESOURCE not in audiences:
-            raise AuthorizationError("Invalid audience", 403)
-
-    if LOGTO_REQUIRED_SCOPES:
-        scope_str = payload.get("scope") or ""
-        scopes = scope_str.split() if isinstance(scope_str, str) else []
-        missing = [s for s in LOGTO_REQUIRED_SCOPES if s not in scopes]
-        if missing:
-            raise AuthorizationError(f"Insufficient scope: missing {missing}", 403)
-
-
-def create_auth_info(payload: dict[str, Any]) -> LogToAuthInfo:
-    """Build AuthInfo from validated JWT payload."""
-    scope_str = payload.get("scope") or ""
-    scopes = scope_str.split() if isinstance(scope_str, str) else []
-
-    aud = payload.get("aud")
-    audience = [aud] if isinstance(aud, str) else (aud or [])
-
-    roles = payload.get("roles")
-    if isinstance(roles, str):
-        roles = [roles]
-    roles = roles or []
-
-    return LogToAuthInfo(
-        sub=payload.get("sub", ""),
-        client_id=payload.get("client_id"),
-        organization_id=payload.get("organization_id"),
+    return AuthInfo(
+        sub=payload.get('sub'),
+        client_id=payload.get('client_id'),
+        organization_id=payload.get('organization_id'),
         scopes=scopes,
-        audience=audience,
-        roles=roles,
+        audience=audience
     )
+
+def verify_payload(payload: Dict[str, Any]) -> None:
+    """Verify payload for global API resources"""
+    # Check audience claim matches your API resource indicator
+    audiences = payload.get('aud', [])
+    if isinstance(audiences, str):
+        audiences = [audiences]
+
+    if os.environ['LOGTO_API_RESOURCE_INDICATOR_URL'] not in audiences:
+        raise AuthorizationError('Invalid audience')
+
+    # Check required scopes for global API resources
+    required_scopes = ['snzr.write', 'snzr.read']
+    scopes = payload.get('scope', '').split(' ') if payload.get('scope') else []
+    if not all(scope in scopes for scope in required_scopes):
+        raise AuthorizationError('Insufficient scope')

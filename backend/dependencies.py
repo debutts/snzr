@@ -1,10 +1,7 @@
 """FastAPI dependencies. Re-export Logto auth for convenience."""
-from infrastructure.auth import (LogToAuthInfo, get_logto_auth, require_roles,
-                                 require_scopes)
+from infrastructure.auth import (AuthInfo, verify_access_token)
 
 __all__ = [
-    "LogToAuthInfo",
-    "get_logto_auth",
-    "require_roles",
-    "require_scopes",
+    "AuthInfo",
+    "verify_access_token"
 ]

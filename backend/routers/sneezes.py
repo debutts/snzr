@@ -4,14 +4,14 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from dependencies import LogToAuthInfo, get_logto_auth
+from dependencies import AuthInfo, verify_access_token
 from domains.sneeze.models import (CreateSneezeRequest, Sneeze,
                                    UpdateSneezeRequest)
 
 router = APIRouter(
     prefix="/sneezes",
     tags=["sneezes"],
-    dependencies=[Depends(get_logto_auth)],
+    dependencies=[Depends(verify_access_token)],
     responses={404: {"description": "Not found"}},
 )
 
@@ -38,7 +38,7 @@ def _now_utc() -> datetime:
 )
 async def create_sneeze(
     body: CreateSneezeRequest,
-    auth: Annotated[LogToAuthInfo, Depends(get_logto_auth)],
+    auth: Annotated[AuthInfo, Depends(verify_access_token)],
 ) -> Sneeze:
     """Create a new sneeze. If `occurred_at` is not provided, it defaults to now (UTC)."""
     occurred_at = body.occurred_at if body.occurred_at is not None else _now_utc()
