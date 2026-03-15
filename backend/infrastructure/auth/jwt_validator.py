@@ -1,7 +1,7 @@
 import jwt
 from jwt import PyJWKClient
 from typing import Dict, Any
-from auth_middleware import AuthInfo, AuthorizationError, JWKS_URI, ISSUER
+from .auth_middleware import AuthInfo, AuthorizationError, JWKS_URI, ISSUER
 import os
 
 _jwks_client = None

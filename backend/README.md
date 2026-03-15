@@ -6,6 +6,8 @@ python fast api backend
 
 **Python API:** `uvicorn main:app --reload` (from project root).
 
+swaggar running at `http://127.0.0.1:8000/docs#/default/root__get`
+
 ## File Structure
 
 Architecture for a FastAPI app using [Logto](https://logto.io/) for auth and [SQLModel](https://fastapi.tiangolo.com/tutorial/sql-databases/) for persistence, with a clean domain-driven layout.

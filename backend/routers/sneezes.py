@@ -6,9 +6,13 @@ from domains.sneeze.models import (CreateSneezeRequest, Sneeze,
                                    UpdateSneezeRequest)
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from backend.infrastructure.persistence.sneeze_repository import (
-    repo_create_sneeze, repo_delete_sneeze, repo_get_all_sneezes_by_user_id,
-    repo_get_sneeze_by_id, repo_update_sneeze)
+from infrastructure.persistence.sneeze_repository import (
+    repo_create_sneeze,
+    repo_delete_sneeze,
+    repo_get_all_sneezes_by_user_id,
+    repo_get_sneeze_by_id,
+    repo_update_sneeze,
+)
 
 router = APIRouter(
     prefix="/sneezes",

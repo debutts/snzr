@@ -1,4 +1,4 @@
-from common.db_engine import engine
+from infrastructure.persistence.common.db_engine import engine
 from domains.sneeze.models import Sneeze, UpdateSneezeRequest
 from sqlmodel import Session, select
 

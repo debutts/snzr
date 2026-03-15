@@ -2,7 +2,6 @@ import os
 
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jwt_validator import create_auth_info, validate_jwt
 
 # When True, no Bearer token is required; a dev AuthInfo is used. For local dev/testing only.
 _DISABLE_AUTH = os.environ.get("DISABLE_AUTH", "").lower() in ("1", "true")
@@ -64,6 +63,7 @@ def verify_access_token(
             detail="Missing or invalid authorization header",
         )
     try:
+        from .jwt_validator import create_auth_info, validate_jwt
         token = credentials.credentials
         payload = validate_jwt(token)
         return create_auth_info(payload)

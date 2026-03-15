@@ -1,10 +1,15 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Load .env from the backend directory so DATABASE_URL etc. are set before other imports
+load_dotenv(Path(__file__).resolve().parent / ".env")
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-
-from backend.infrastructure.persistence.common.db_engine import \
-    create_db_and_tables
-from backend.routers import sneezes
+from infrastructure.persistence.common.db_engine import create_db_and_tables
+from routers import sneezes
 
 
 @asynccontextmanager
