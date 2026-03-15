@@ -12,6 +12,27 @@ services:
       POSTGRES_PASSWORD: postgresql
     volumes:
       - postgresql_db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI backend
+  backend:
+    build: .
+    container_name: snzr-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgresql@postgresql_db:5432/postgres
+      LOGTO_API_RESOURCE_INDICATOR_URL: "https://snzr-api"
+      LOGTO_TENANT_URL: "https://mwgoqx.logto.app"
+      DISABLE_AUTH: "true"
+    depends_on:
+      postgresql_db:
+        condition: service_healthy
 
   # pgAdmin4 Web UI for PostgreSQL database
   pgadmin:

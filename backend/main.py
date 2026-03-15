@@ -21,8 +21,3 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(sneezes.router)
-
-
-@app.get("/")
-async def root():
-    return {"message": "Hello Snzr!"}
