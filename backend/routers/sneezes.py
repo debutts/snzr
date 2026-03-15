@@ -1,12 +1,14 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Annotated
-from uuid import uuid4
-
-from fastapi import APIRouter, Depends, HTTPException, status
 
 from dependencies import AuthInfo, verify_access_token
 from domains.sneeze.models import (CreateSneezeRequest, Sneeze,
                                    UpdateSneezeRequest)
+from fastapi import APIRouter, Depends, HTTPException, status
+
+from backend.infrastructure.persistence.sneeze_repository import (
+    repo_create_sneeze, repo_delete_sneeze, repo_get_all_sneezes_by_user_id,
+    repo_get_sneeze_by_id, repo_update_sneeze)
 
 router = APIRouter(
     prefix="/sneezes",
@@ -14,17 +16,6 @@ router = APIRouter(
     dependencies=[Depends(verify_access_token)],
     responses={404: {"description": "Not found"}},
 )
-
-# ---------------------------------------------------------------------------
-# In-memory store (replace with DB later)
-# ---------------------------------------------------------------------------
-
-fake_sneezes_db: dict[str, Sneeze] = {}
-
-
-def _now_utc() -> datetime:
-    return datetime.now(timezone.utc)
-
 
 # ---------------------------------------------------------------------------
 # CRUD endpoints
@@ -41,26 +32,24 @@ async def create_sneeze(
     auth: Annotated[AuthInfo, Depends(verify_access_token)],
 ) -> Sneeze:
     """Create a new sneeze. If `occurred_at` is not provided, it defaults to now (UTC)."""
-    occurred_at = body.occurred_at if body.occurred_at is not None else _now_utc()
+
     sneeze = Sneeze(
-        id=str(uuid4()),
         user_id=auth.sub,
         notes=body.notes,
-        occurred_at=occurred_at,
+        occurred_at=body.occurred_at if body.occurred_at is not None else datetime.now(),
         location=body.location,
         volume=body.volume,
     )
-    fake_sneezes_db[sneeze.id] = sneeze
-    return sneeze
+    return repo_create_sneeze(sneeze)
 
 
 @router.get(
     "/",
     summary="List sneezes",
 )
-async def list_sneezes() -> list[Sneeze]:
+async def list_sneezes(auth: Annotated[AuthInfo, Depends(verify_access_token)]) -> list[Sneeze]:
     """Return all sneezes (order not guaranteed; add query params for filtering later)."""
-    return list(fake_sneezes_db.values())
+    return repo_get_all_sneezes_by_user_id(auth.sub)
 
 
 @router.get(
@@ -69,11 +58,10 @@ async def list_sneezes() -> list[Sneeze]:
 )
 async def get_sneeze(sneeze_id: str) -> Sneeze:
     """Return a single sneeze by ID."""
-    if sneeze_id not in fake_sneezes_db:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    return fake_sneezes_db[sneeze_id]
+    try:
+        return repo_get_sneeze_by_id(sneeze_id)
+    except ValueError as e:
+        handle_value_error(e)
 
 
 @router.put(
@@ -82,22 +70,10 @@ async def get_sneeze(sneeze_id: str) -> Sneeze:
 )
 async def update_sneeze(sneeze_id: str, body: UpdateSneezeRequest) -> Sneeze:
     """Update an existing sneeze."""
-    if sneeze_id not in fake_sneezes_db:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    existing = fake_sneezes_db[sneeze_id]
-    updated = Sneeze(
-        id=existing.id,
-        user_id=existing.user_id,
-        notes=body.notes,
-        occurred_at=body.occurred_at,
-        location=body.location,
-        volume=body.volume,
-    )
-    fake_sneezes_db[sneeze_id] = updated
-    return updated
-
+    try:
+        return repo_update_sneeze(sneeze_id, body)
+    except ValueError as e:
+        handle_value_error(e)
 
 @router.delete(
     "/{sneeze_id}",
@@ -106,8 +82,13 @@ async def update_sneeze(sneeze_id: str, body: UpdateSneezeRequest) -> Sneeze:
 )
 async def delete_sneeze(sneeze_id: str) -> None:
     """Delete a sneeze by ID."""
-    if sneeze_id not in fake_sneezes_db:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-        )
-    del fake_sneezes_db[sneeze_id]
+    try:
+        repo_delete_sneeze(sneeze_id)
+    except ValueError as e:
+        handle_value_error(e)
+
+def handle_value_error(e: ValueError) -> None:
+    if "not found" in str(e):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sneeze not found")
+    else:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")

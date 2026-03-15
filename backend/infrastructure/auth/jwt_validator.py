@@ -4,11 +4,20 @@ from typing import Dict, Any
 from auth_middleware import AuthInfo, AuthorizationError, JWKS_URI, ISSUER
 import os
 
-jwks_client = PyJWKClient(JWKS_URI)
+_jwks_client = None
+
+def _get_jwks_client():
+    global _jwks_client
+    if _jwks_client is None:
+        if not JWKS_URI:
+            raise AuthorizationError("JWKS not configured (auth may be disabled)", 500)
+        _jwks_client = PyJWKClient(JWKS_URI)
+    return _jwks_client
 
 def validate_jwt(token: str) -> Dict[str, Any]:
     """Validate JWT and return payload"""
     try:
+        jwks_client = _get_jwks_client()
         signing_key = jwks_client.get_signing_key_from_jwt(token)
 
         payload = jwt.decode(
