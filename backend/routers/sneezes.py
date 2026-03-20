@@ -60,10 +60,10 @@ async def list_sneezes(auth: Annotated[AuthInfo, Depends(verify_access_token)]) 
     "/{sneeze_id}",
     summary="Get sneeze by ID",
 )
-async def get_sneeze(sneeze_id: str) -> Sneeze:
+async def get_sneeze(sneeze_id: str, auth: Annotated[AuthInfo, Depends(verify_access_token)]) -> Sneeze:
     """Return a single sneeze by ID."""
     try:
-        return repo_get_sneeze_by_id(sneeze_id)
+        return repo_get_sneeze_by_id(sneeze_id, auth.sub)
     except ValueError as e:
         handle_value_error(e)
 
@@ -72,10 +72,10 @@ async def get_sneeze(sneeze_id: str) -> Sneeze:
     "/{sneeze_id}",
     summary="Update a sneeze",
 )
-async def update_sneeze(sneeze_id: str, body: UpdateSneezeRequest) -> Sneeze:
+async def update_sneeze(sneeze_id: str, body: UpdateSneezeRequest, auth: Annotated[AuthInfo, Depends(verify_access_token)]) -> Sneeze:
     """Update an existing sneeze."""
     try:
-        return repo_update_sneeze(sneeze_id, body)
+        return repo_update_sneeze(sneeze_id, auth.sub, body)
     except ValueError as e:
         handle_value_error(e)
 
@@ -84,10 +84,10 @@ async def update_sneeze(sneeze_id: str, body: UpdateSneezeRequest) -> Sneeze:
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Delete a sneeze",
 )
-async def delete_sneeze(sneeze_id: str) -> None:
+async def delete_sneeze(sneeze_id: str, auth: Annotated[AuthInfo, Depends(verify_access_token)]) -> None:
     """Delete a sneeze by ID."""
     try:
-        repo_delete_sneeze(sneeze_id)
+        repo_delete_sneeze(sneeze_id, auth.sub)
     except ValueError as e:
         handle_value_error(e)
 
