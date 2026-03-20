@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Annotated
 
+from backend.domains.sneeze.requests import CreateSneezeRequest, UpdateSneezeRequest
 from dependencies import AuthInfo, verify_access_token
-from domains.sneeze.models import (CreateSneezeRequest, Sneeze,
-                                   UpdateSneezeRequest)
+from domains.sneeze.models import Sneeze
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from infrastructure.persistence.sneeze_repository import (

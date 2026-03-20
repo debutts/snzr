@@ -24,3 +24,8 @@ Architecture for a FastAPI app using [Logto](https://logto.io/) for auth and [SQ
 
 - <https://fastapi.tiangolo.com/tutorial/sql-databases/#create-an-engine>
 - <https://medium.com/@shahpranshu27/connecting-fastapi-to-a-database-using-postgresql-and-sqlmodel-beginner-friendly-guide-52b5aabe6ac3>
+
+## To - Do
+
+[] implement tag modification when performing create/update on tags
+[] implement auth for backend (get it testable locally)
