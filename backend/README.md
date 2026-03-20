@@ -32,3 +32,4 @@ Architecture for a FastAPI app using [Logto](https://logto.io/) for auth and [SQ
 [] implement auth for backend (get it testable locally)
 [] add ability to get sneeze by tag
 [] create basic front end app
+[] implement basic testing <https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/>

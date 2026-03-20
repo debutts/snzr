@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from backend.domains.sneeze.requests import CreateSneezeRequest, UpdateSneezeRequest
+from domains.sneeze.requests import CreateSneezeRequest, UpdateSneezeRequest
 from dependencies import AuthInfo, verify_access_token
 from domains.sneeze.models import Sneeze
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -44,7 +44,8 @@ async def create_sneeze(
         location=body.location,
         volume=body.volume,
     )
-    return repo_create_sneeze(sneeze)
+    sneeze = repo_create_sneeze(sneeze, tag_names=body.tag_names)
+    return sneeze
 
 
 @router.get(
