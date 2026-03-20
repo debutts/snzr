@@ -2,12 +2,12 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 from sqlmodel import Field, Relationship, SQLModel
-from backend.domains.tag.models import Tag
+from domains.tag.models import Tag
 
 class SneezeTagLink(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True)
-    sneezeId = str = Field(foreign_key="sneeze.id", index=True)
-    tagId = str = Field(foreign_key="tag.id", index=True)
+    sneeze_id: str = Field(foreign_key="sneeze.id", index=True)
+    tag_id: str = Field(foreign_key="tag.id", index=True)
 
 class Sneeze(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True)
