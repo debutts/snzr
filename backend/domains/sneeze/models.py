@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import Optional
 from uuid import uuid4
-from sqlmodel import Field, Relationship, SQLModel
+
 from domains.tag.models import Tag
+from sqlmodel import Field, Relationship, SQLModel
+
 
 class SneezeTagLink(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True)
@@ -17,7 +19,6 @@ class Sneeze(SQLModel, table=True):
     location: Optional[str] = Field(default=None, max_length=1000)
     volume: Optional[int] = Field(default=None, ge=0, le=10)
     tags: list[Tag] = Relationship(
-        back_populates="sneezes",
         link_model=SneezeTagLink,
         sa_relationship_kwargs={"lazy": "selectin"},
     )
