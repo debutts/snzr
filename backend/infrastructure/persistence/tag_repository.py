@@ -33,7 +33,7 @@ def repo_get_tag(id: str) -> Tag:
       raise ValueError(f"Tag with id {id} not found")
     return tag
 
-def get_or_create_tags_by_names(session: Session, names: list[str] | None) -> list[Tag]:
+def repo_get_or_create_tags_by_names(session: Session, names: list[str] | None) -> list[Tag]:
     if not names:
         return []
     names = [name.strip().lower() for name in names]

@@ -3,7 +3,7 @@ from domains.sneeze.requests import UpdateSneezeRequest
 from domains.tag.models import Tag
 from infrastructure.persistence.common.db_engine import engine
 from infrastructure.persistence.tag_repository import \
-    get_or_create_tags_by_names
+    repo_get_or_create_tags_by_names
 from sqlmodel import Session, select
 
 
@@ -19,7 +19,7 @@ def _save_sneeze(session: Session, sneeze: Sneeze) -> Sneeze:
 
 def repo_create_sneeze(sneeze: Sneeze, tag_names: list[str] | None = None) -> Sneeze:
     with Session(engine) as session:
-        tags = get_or_create_tags_by_names(session, tag_names)
+        tags = repo_get_or_create_tags_by_names(session, tag_names)
         sneeze.tags = tags
         return _save_sneeze(session, sneeze)
 
@@ -55,7 +55,7 @@ def repo_update_sneeze(id: str, user_id: str, update_request: UpdateSneezeReques
             raise ValueError(f"Sneeze with id {id} not found")
         if sneeze.user_id != user_id:
             raise PermissionError(f"User does not have permission to edit sneeze with id {id}")
-        tags = get_or_create_tags_by_names(session, update_request.tag_names)
+        tags = repo_get_or_create_tags_by_names(session, update_request.tag_names)
         sneeze.tags = tags
         sneeze.notes = update_request.notes
         sneeze.occurred_at = update_request.occurred_at
