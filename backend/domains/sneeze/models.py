@@ -20,5 +20,5 @@ class Sneeze(SQLModel, table=True):
     volume: Optional[int] = Field(default=None, ge=0, le=10)
     tags: list[Tag] = Relationship(
         link_model=SneezeTagLink,
-        sa_relationship_kwargs={"lazy": "selectin"},
+        sa_relationship_kwargs={"lazy": "joined"},
     )
