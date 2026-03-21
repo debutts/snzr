@@ -20,11 +20,12 @@ def repo_get_tag_by_name(name: str) -> Tag | None:
     statement = select(Tag).where(Tag.name == name)
     return session.exec(statement).first()
 
-def repo_get_tag_by_names(names: list[str]) -> Tag | None:
-  with Session(engine) as session:
-    statement = select(Tag).where(Tag.name in names)
-    tags = list(session.exec(statement).all())
-    return tags
+def repo_get_tags_by_names(names: list[str]) -> list[Tag]:
+    if not names:
+        return []
+    with Session(engine) as session:
+        statement = select(Tag).where(Tag.name.in_(names))
+        return list(session.exec(statement).all())
 
 def repo_get_tag(id: str) -> Tag:
   with Session(engine) as session:
@@ -37,7 +38,7 @@ def repo_get_or_create_tags_by_names(session: Session, names: list[str] | None) 
     if not names:
         return []
     names = [name.strip().lower() for name in names]
-    tags = repo_get_tag_by_names(names)
+    tags = repo_get_tags_by_names(names)
     tags_dict = {tag.name: tag for tag in tags}
     for name in names:
       if name not in tags_dict:

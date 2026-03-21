@@ -42,8 +42,16 @@ def repo_get_all_sneezes_by_user_id(user_id: str) -> list[Sneeze]:
         return list(result.unique().all())
 
 def repo_get_all_sneezes_by_tag_and_user(tag: str, user_id: str) -> list[Sneeze]:
+    tag_key = tag.strip().lower()
     with Session(engine) as session:
-        statement = select(Sneeze).join(SneezeTagLink).join(Tag).where(Tag.name == tag and Sneeze.user_id == user_id).order_by(Sneeze.occurred_at.desc())
+        statement = (
+            select(Sneeze)
+            .join(SneezeTagLink, SneezeTagLink.sneeze_id == Sneeze.id)
+            .join(Tag, Tag.id == SneezeTagLink.tag_id)
+            .where(Tag.name == tag_key)
+            .where(Sneeze.user_id == user_id)
+            .order_by(Sneeze.occurred_at.desc())
+        )
         result = session.exec(statement)
         return list(result.unique().all())
 

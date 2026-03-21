@@ -5,3 +5,6 @@ psycopg2-binary
 pydantic==2.11.7
 pyjwt[crypto]>=2.8.0
 sqlmodel
+requests
+pytest
+httpx
