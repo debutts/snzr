@@ -1,12 +1,17 @@
-import { Text, View } from 'react-native';
+import { LogtoConfig, LogtoProvider } from '@logto/rn';
+import React from 'react';
 import "./global.css";
+import { ProtectedRoute } from './views/protectedRoute';
+
+const config: LogtoConfig = {
+  endpoint: process.env.LOGTO_ENDPOINT,
+  appId: process.env.LOGTO_APP_ID,
+};
 
 export default function App() {
   return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-xl font-bold text-blue-500">
-        Welcome to Nativewind!
-      </Text>
-    </View>
+    <LogtoProvider config={config}>
+      <ProtectedRoute/>
+    </LogtoProvider>
   );
 }

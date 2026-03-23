@@ -9,9 +9,14 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@logto/rn": "^1.1.0",
+    "@react-native-async-storage/async-storage": "^3.0.1",
     "babel-preset-expo": "^55.0.12",
     "expo": "~55.0.8",
+    "expo-crypto": "^55.0.10",
+    "expo-secure-store": "^55.0.9",
     "expo-status-bar": "~55.0.4",
+    "expo-web-browser": "^55.0.10",
     "nativewind": "^4.2.3",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "react": "19.2.0",
