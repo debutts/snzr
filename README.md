@@ -15,7 +15,7 @@ Sneeze Tracking App
 
 ### Frontend
 
-- [ ] auth for front end
+- [x] auth for front end
 - [ ] view sneezes front end
 - [ ] create new sneezes fe
 - [ ] edit sneezes front end

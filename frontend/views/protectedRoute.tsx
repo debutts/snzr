@@ -3,9 +3,13 @@ import { Button, Text, View } from 'react-native';
 
 export const ProtectedRoute = () => {
   const { signIn, signOut, isAuthenticated } = useLogto();
+  const LOGTO_REDIRECT_URL = process.env.EXPO_PUBLIC_LOGTO_REDIRECT_URL;
+  const handleSignIn = async () => {
+    await signIn(LOGTO_REDIRECT_URL);
+  };
 
   return (
-    <div>
+    <>
       {isAuthenticated ? (
         <View className="flex-1 items-center justify-center bg-white">
           <Text className="text-xl font-bold text-blue-500">
@@ -18,10 +22,9 @@ export const ProtectedRoute = () => {
           <Text className="text-xl font-bold text-blue-500">
             Welcome to snzr!
           </Text>
-          //todo Replace the redirect URI with your own
-          <Button title="Sign in" onPress={async () => signIn(process.env.LOGTO_REDIRECT_URL)} />
+          <Button title="Sign in" onPress={handleSignIn} />
         </View>
       )}
-    </div>
+    </>
   );
 };

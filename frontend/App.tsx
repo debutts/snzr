@@ -4,8 +4,8 @@ import "./global.css";
 import { ProtectedRoute } from './views/protectedRoute';
 
 const config: LogtoConfig = {
-  endpoint: process.env.LOGTO_ENDPOINT,
-  appId: process.env.LOGTO_APP_ID,
+  endpoint: process.env.EXPO_PUBLIC_LOGTO_ENDPOINT,
+  appId: process.env.EXPO_PUBLIC_LOGTO_APP_ID,
 };
 
 export default function App() {
